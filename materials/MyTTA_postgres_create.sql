@@ -16,9 +16,9 @@ CREATE TABLE "public.profiles" (
 	"name" varchar(255) NOT NULL,
 	"surname" varchar(255) NOT NULL,
 	"patronymic" varchar(255) NOT NULL,
-	"user_id" int(255) NOT NULL,
-	"job_id" int(255) NOT NULL,
-	"department_id" int(255) NOT NULL,
+	"user_id" int NOT NULL,
+	"job_id" int NOT NULL,
+	"department_id" int NOT NULL,
 	CONSTRAINT "profiles_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -60,9 +60,9 @@ CREATE TABLE "public.jobs_departments" (
 
 CREATE TABLE "public.tickets" (
 	"id" serial NOT NULL,
-	"title" varchar(255) NOT NULL,
-	"text" varchar(255) NOT NULL,
-	"owner_id" int(255) NOT NULL,
+	"title" varchar(50) NOT NULL,
+	"text" varchar(1000) NOT NULL,
+	"owner_id" int NOT NULL,
 	"img" varchar(255) NOT NULL,
 	CONSTRAINT "tickets_pk" PRIMARY KEY ("id")
 ) WITH (

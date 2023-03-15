@@ -1,14 +1,15 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship, backref
 
-from .database import Base
+from database import Base
 
 
 JobDepartment = Table(
     'jobs_departments',
+    Base.metadata,
     Column('id', Integer, primary_key=True, index=True),
-    Column('job_id', Integer, ForeignKey('Job.id')),
-    Column('department_id', Integer, ForeignKey('Department.id'))
+    Column('job_id', Integer, ForeignKey('jobs.id')),
+    Column('department_id', Integer, ForeignKey('departments.id'))
 )
 
 class Job(Base):
@@ -43,7 +44,7 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
 
     profile = relationship('Profile', back_populates='user')
-    tickets = relationship('Ticket', back_populates='user')
+    tickets = relationship('Ticket', back_populates='owner')
 
 
 class Profile(Base):
@@ -52,29 +53,26 @@ class Profile(Base):
     name = Column(String(20))
     surmane = Column(String(30))
     patronymic = Column(String(20))
-    user_id = Column(ForeignKey('User.id'))
-    job_id = Column(Integer, ForeignKey('Job.id'))
-    department_id = Column(Integer, ForeignKey('Job.id'))
+    user_id = Column(ForeignKey('users.id'))
+    job_id = Column(Integer, ForeignKey('jobs.id'))
+    department_id = Column(Integer, ForeignKey('jobs.id'))
 
     user = relationship('User', back_populates='profile')
 
 
 SuperuserTicket = Table(
     'superuser_tickets',
+    Base.metadata,
     Column('id', Integer, primary_key=True, index=True),
-    Column('superuser_id', Integer, ForeignKey('Superuser.id')),
-    Column('ticket_id', Integer, ForeignKey('Ticket.id'))
+    Column('superuser_id', Integer, ForeignKey('superusers.id')),
+    Column('ticket_id', Integer, ForeignKey('tickets.id'))
 )
 
 
 class Superuser(Base):
     __tablename__ = 'superusers'
-    user_id = Column(ForeignKey('User.id'))
-    tickets = relationship(
-        'Ticket',
-        secondary=SuperuserTicket,
-        backref='Superuser'
-    )
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(ForeignKey('users.id'))
 
 
 class Ticket(Base):
@@ -83,7 +81,7 @@ class Ticket(Base):
     title = Column(String(50))
     text = Column(String(1000))
     image = Column(String(1000))
-    owner_id = Column(Integer, ForeignKey('User.id'))
+    owner_id = Column(Integer, ForeignKey('users.id'))
     
     owner = relationship("User", back_populates="tickets")
     superusers = relationship(
@@ -91,7 +89,7 @@ class Ticket(Base):
         secondary=SuperuserTicket,
         backref='tickets'
     )
-    comments = relationship('Comment', backref='ticket')
+    comments = relationship('Comment', back_populates='ticket')
 
 
 class Comment(Base):
@@ -99,12 +97,12 @@ class Comment(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String(1000))
     image = Column(String(1000))
-    user_id = Column(ForeignKey('User.id'))
-    ticket_id = Column(Integer, ForeignKey('Ticket.id'))
-    parent_id = Column(Integer, ForeignKey('Comment.id'))
+    user_id = Column(ForeignKey('users.id'))
+    ticket_id = Column(Integer, ForeignKey('tickets.id'))
+    parent_id = Column(Integer, ForeignKey('comments.id'))
 
     user = relationship('User', backref='comments')
-    ticket = relationship('Ticket', backref='comments')
+    ticket = relationship('Ticket', back_populates='comments')
     replies = relationship(
         'Comment',
         backref=backref('parent', remote_side=[id]),
