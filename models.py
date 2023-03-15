@@ -44,7 +44,7 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
 
     profile = relationship('Profile', back_populates='user')
-    tickets = relationship('Ticket', back_populates='user')
+    tickets = relationship('Ticket', back_populates='owner')
 
 
 class Profile(Base):
@@ -73,11 +73,6 @@ class Superuser(Base):
     __tablename__ = 'superusers'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(ForeignKey('users.id'))
-    tickets = relationship(
-        'Ticket',
-        secondary=SuperuserTicket,
-        backref='Superuser'
-    )
 
 
 class Ticket(Base):
@@ -94,7 +89,7 @@ class Ticket(Base):
         secondary=SuperuserTicket,
         backref='tickets'
     )
-    comments = relationship('Comment', backref='ticket')
+    comments = relationship('Comment', back_populates='ticket')
 
 
 class Comment(Base):
@@ -107,7 +102,7 @@ class Comment(Base):
     parent_id = Column(Integer, ForeignKey('comments.id'))
 
     user = relationship('User', backref='comments')
-    ticket = relationship('Ticket', backref='comments')
+    ticket = relationship('Ticket', back_populates='comments')
     replies = relationship(
         'Comment',
         backref=backref('parent', remote_side=[id]),

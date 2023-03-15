@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
-import models, schemas
+import models
+from schemas import tickets, jobs, users
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
@@ -13,9 +14,15 @@ def get_user(db: Session, user_id: int):
     ).first()
 
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter(
+        models.User.email == email
+    ).first()
+
+
 def create_user(
         db: Session,
-        user: schemas.tickets.UserCreate,
+        user: users.UserCreate,
 ) -> models.User :
     # add hash password func here
     db_user = models.User(
@@ -39,7 +46,7 @@ def get_ticket(db: Session, ticket_id: int):
 
 def create_ticket(
         db: Session,
-        ticket: schemas.tickets.TicketCreate,
+        ticket: tickets.TicketCreate,
         user_id: int
 ) -> models.Ticket :
     db_ticket = models.Ticket(
