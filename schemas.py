@@ -14,20 +14,16 @@ class Department(BaseModel):
     jobs: list[int]
 
 
-class Role(BaseModel):
-    id: int
-    name: str
-
-
 class User(BaseModel):
     id: int
     email: str
     passworf: str
     is_active: bool
+    is_superuser: bool
 
 
 class SuperUser(User):
-    tickets = list[int]
+    user_id = int
 
 
 class Profile(BaseModel):
@@ -41,6 +37,16 @@ class Profile(BaseModel):
 
 class Ticket(BaseModel):
     id: int
-    name: str
-    description: str
-    owner: int
+    title: str
+    text: str
+    image: str
+    owner_id: int
+
+
+class Comment(BaseModel):
+    id: int
+    text: str
+    image: str
+    user_id: int
+    ticket_id: int
+    parent_id: int
