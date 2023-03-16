@@ -79,6 +79,8 @@ class Superuser(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(ForeignKey('users.id'))
 
+    user = relationship('User', backref='superuser')
+
 
 class Ticket(Base):
     __tablename__ = 'tickets'

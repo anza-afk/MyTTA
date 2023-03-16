@@ -21,7 +21,7 @@ def get_user(db: Session, user_id: int):
     ).first()
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> models.User:
     return db.query(models.User).filter(
         models.User.email == email
     ).first()
@@ -37,12 +37,34 @@ def create_superuser(
     commit_to_db(db=db, db_model=db_superuser)
 
 
+def get_superuser(
+    user_id: int,
+    db: Session
+) -> models.Superuser:
+    return db.query(models.User).filter(
+        models.Superuser.user_id == user_id
+    ).first()
+
+
+def delete_superuser(
+    user_id: int,
+    db: Session
+) -> dict:
+    db_superuser = db.query(models.Superuser).filter(
+        models.Superuser.user_id == user_id
+    ).first()
+    db.delete(db_superuser)
+    db.commit()
+    return {'ok': True}
+
+
 def create_user(
         db: Session,
         user: users.UserCreate,
         is_super: bool
 ) -> models.User :
     # add hash password func here
+
     db_user = models.User(
         **user.dict(),
     )
@@ -58,9 +80,10 @@ def update_user(
         db: Session,
         user_id: int,
         update_data: users.UserBase,
+        is_super: bool
 ) -> models.User :
     db_user = db.query(models.User).filter(
-        models.User.id == user_id
+        models.User.id == user_id,
     ).first()
     if not db_user:
         raise HTTPException(
@@ -68,9 +91,15 @@ def update_user(
             detail=f'The User with the id {user_id} is not found'
         )
     else:
-        
         for key, value in update_data.items():
             setattr(db_user, key, value)
+        print(is_super)
+        if is_super is not None:
+            if is_super and not get_superuser(db=db, user_id=db_user.id):
+                create_superuser(db=db, user_id=db_user.id)
+            else:
+                delete_superuser(db=db, user_id=db_user.id)
+
         db.commit()
         db.refresh(db_user)
         return db_user
