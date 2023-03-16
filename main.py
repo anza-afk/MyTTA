@@ -57,13 +57,15 @@ def update_user(
     user_id: int,
     user: users.UserBase,
     db: Session = Depends(get_db),
-    # is_super: bool = Body(default=False)
+    is_super: bool = Body(default=None)
 ):
     update_data = user.dict()
+ 
     return crud.update_user(
         db=db,
         user_id=user_id,
-        update_data=update_data
+        update_data=update_data,
+        is_super=is_super
     )
 
 
