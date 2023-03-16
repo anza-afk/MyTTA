@@ -3,6 +3,7 @@ from pydantic import BaseModel
 # User Pydantic models
 class UserBase(BaseModel):
     email: str
+    is_active: bool = True
 
     class Config:
         orm_mode = True
@@ -10,8 +11,6 @@ class UserBase(BaseModel):
 
 class User(UserBase):
     id: int
-    is_active: bool
-    is_superuser: bool  # need to find good way to define this
 
 
 class UserCreate(UserBase):
@@ -20,6 +19,7 @@ class UserCreate(UserBase):
 
 class Superuser(BaseModel):
     user_id = int
+
 
 # Profile Pydantic models
 class ProfileBase(BaseModel):

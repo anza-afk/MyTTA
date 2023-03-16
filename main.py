@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI, Depends, HTTPException
+from fastapi import APIRouter, FastAPI, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 
 from database import SessionLocal, engine
@@ -8,6 +8,7 @@ from schemas import jobs, tickets, users
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="MyTTA")
+
 
 def get_db():
     db = SessionLocal()
@@ -40,14 +41,30 @@ def fetch_user(user_id: int, db: Session = Depends(get_db)):
 @app.post('/users/', response_model=users.User)
 def create_user(
     user: users.UserCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    is_super: bool = Body(default=False)
 ):
     if crud.get_user_by_email(db=db, email=user.email):
         raise HTTPException(
             status_code=400,
             detail=f"{user.email} is already registered"
         )
-    return crud.create_user(db=db, user=user)
+    return crud.create_user(db=db, user=user, is_super=is_super)
+
+
+@app.patch('/users/', response_model=users.User)
+def update_user(
+    user_id: int,
+    user: users.UserBase,
+    db: Session = Depends(get_db),
+    # is_super: bool = Body(default=False)
+):
+    update_data = user.dict()
+    return crud.update_user(
+        db=db,
+        user_id=user_id,
+        update_data=update_data
+    )
 
 
 @app.get('/tickets/', response_model=list[tickets.Ticket])
