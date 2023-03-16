@@ -21,7 +21,7 @@ class Job(Base):
     departments = relationship(
         'Department',
         secondary=JobDepartment,
-        backref='Job'
+        back_populates='jobs'
     )
 
 
@@ -33,7 +33,7 @@ class Department(Base):
     jobs = relationship(
         'Job',
         secondary=JobDepartment,
-        backref='Department'
+        back_populates='departments'
     )
 
 
@@ -47,6 +47,9 @@ class User(Base):
 
     profile = relationship('Profile', back_populates='user')
     tickets = relationship('Ticket', back_populates='owner')
+
+    def deactivate_user(self):
+        self.is_active = False
 
 
 class Profile(Base):
