@@ -90,6 +90,7 @@ class Ticket(Base):
     image = Column(String(1000), nullable=True)
     owner_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    resolved = Column(Boolean, default=False)
     resolved_at = Column(DateTime, nullable=True, default=None)
 
     owner = relationship("User", back_populates="tickets")
