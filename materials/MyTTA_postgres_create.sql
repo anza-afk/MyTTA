@@ -3,7 +3,6 @@ CREATE TABLE "public.users" (
 	"email" varchar(255) NOT NULL UNIQUE,
 	"password" varchar(255) NOT NULL,
 	"is_active" bool NOT NULL,
-	"is_superuser" bool NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -64,6 +63,8 @@ CREATE TABLE "public.tickets" (
 	"text" varchar(1000) NOT NULL,
 	"owner_id" int NOT NULL,
 	"img" varchar(255) NOT NULL,
+	"created_at" timestamp with time zone NOT NULL,
+	"resolved_at" timestamp with time zone,
 	CONSTRAINT "tickets_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -99,6 +100,7 @@ CREATE TABLE "public.comments" (
 	"user_id" int NOT NULL,
 	"ticket_id" int NOT NULL,
 	"parent_id" int NOT NULL,
+	"created_at" timestamp with time zone,
 	CONSTRAINT "comments_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

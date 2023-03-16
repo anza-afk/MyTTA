@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
+import datetime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship, backref
 
 from database import Base
@@ -11,6 +12,7 @@ JobDepartment = Table(
     Column('job_id', Integer, ForeignKey('jobs.id')),
     Column('department_id', Integer, ForeignKey('departments.id'))
 )
+
 
 class Job(Base):
     __tablename__ = 'jobs'
@@ -41,7 +43,7 @@ class User(Base):
     email = Column(String, nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
+    # is_superuser = Column(Boolean, default=False)
 
     profile = relationship('Profile', back_populates='user')
     tickets = relationship('Ticket', back_populates='owner')
@@ -52,7 +54,7 @@ class Profile(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(20))
     surmane = Column(String(30))
-    patronymic = Column(String(20))
+    patronymic = Column(String(20), nullable=True)
     user_id = Column(ForeignKey('users.id'))
     job_id = Column(Integer, ForeignKey('jobs.id'))
     department_id = Column(Integer, ForeignKey('jobs.id'))
@@ -80,9 +82,11 @@ class Ticket(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(50))
     text = Column(String(1000))
-    image = Column(String(1000))
+    image = Column(String(1000), nullable=True)
     owner_id = Column(Integer, ForeignKey('users.id'))
-    
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    resolved_at = Column(DateTime, nullable=True, default=None)
+
     owner = relationship("User", back_populates="tickets")
     superusers = relationship(
         'Superuser',
@@ -96,10 +100,11 @@ class Comment(Base):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String(1000))
-    image = Column(String(1000))
+    image = Column(String(1000), nullable=True)
     user_id = Column(ForeignKey('users.id'))
     ticket_id = Column(Integer, ForeignKey('tickets.id'))
     parent_id = Column(Integer, ForeignKey('comments.id'))
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     user = relationship('User', backref='comments')
     ticket = relationship('Ticket', back_populates='comments')
